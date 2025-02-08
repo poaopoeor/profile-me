@@ -37,12 +37,12 @@ class _TabsWebState extends State<TabsWeb> {
                       offset: Offset(0, -10),
                     ),
                   ],
-                fontSize: 27.0,
+                fontSize: 25.0,
                 color: Colors.transparent,
                 decoration: TextDecoration.underline,
                 decorationThickness: 2,
                 decorationColor: Colors.tealAccent)
-            : GoogleFonts.oswald(color: Colors.black, fontSize: 23.0),
+            : GoogleFonts.roboto(color: Colors.black, fontSize: 20.0),
         child: Text(
           widget.title,
         ),

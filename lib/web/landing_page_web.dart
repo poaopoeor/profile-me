@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:profile_me/components.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LandingPageWeb extends StatefulWidget {
   const LandingPageWeb({super.key});
@@ -14,7 +16,34 @@ class _LandingPageWebState extends State<LandingPageWeb> {
     var heightDevice = MediaQuery.of(context).size.height;
     var widthDevice = MediaQuery.of(context).size.width;
     return Scaffold(
-      drawer: Drawer(),
+      drawer: Drawer(
+        backgroundColor: Colors.white,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              radius: 72.0,
+              backgroundColor: Colors.tealAccent,
+              child: CircleAvatar(
+                radius: 70.0,
+                backgroundColor: Colors.white,
+                backgroundImage: AssetImage("assets/image.png"),
+              ),
+            ),
+            SizedBox(height: 15.0),
+            SansBold(text: "Paulina Knop", size: 30.0),
+            SizedBox(height: 15.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                urlLauncher("assets/instagram.svg", "https://instagram.com"),
+                urlLauncher("assets/twitter.svg", "https://x.com"),
+                urlLauncher("github.svg", "https://github.com"),
+              ],
+            ),
+          ],
+        ),
+      ),
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -310,6 +339,19 @@ class _LandingPageWebState extends State<LandingPageWeb> {
           ),
         ],
       ),
+    );
+  }
+
+  IconButton urlLauncher(String imgPath, String url) {
+    return IconButton(
+      icon: SvgPicture.asset(
+        imgPath,
+        colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),
+        width: 35.0,
+      ),
+      onPressed: () async {
+        await launchUrl(Uri.parse(url));
+      },
     );
   }
 }
