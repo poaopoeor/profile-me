@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TabsWeb extends StatefulWidget {
   final String title;
+  final String route;
 
-  const TabsWeb({super.key, required this.title});
+  const TabsWeb({super.key, required this.title, required this.route});
 
   @override
   State<TabsWeb> createState() => _TabsWebState();
@@ -15,38 +18,75 @@ class _TabsWebState extends State<TabsWeb> {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) {
-        setState(() {
-          isSelected = true;
-        });
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).pushNamed(widget.route);
       },
-      onExit: (_) {
-        setState(() {
-          isSelected = false;
-        });
-      },
-      child: AnimatedDefaultTextStyle(
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.elasticIn,
-        style: isSelected
-            ? GoogleFonts.oswald(
-                shadows: [
-                    const Shadow(
-                      color: Colors.black,
-                      offset: Offset(0, -10),
-                    ),
-                  ],
-                fontSize: 25.0,
-                color: Colors.transparent,
-                decoration: TextDecoration.underline,
-                decorationThickness: 2,
-                decorationColor: Colors.tealAccent)
-            : GoogleFonts.roboto(color: Colors.black, fontSize: 20.0),
-        child: Text(
-          widget.title,
+      child: MouseRegion(
+        onEnter: (_) {
+          setState(() {
+            isSelected = true;
+          });
+        },
+        onExit: (_) {
+          setState(() {
+            isSelected = false;
+          });
+        },
+        child: AnimatedDefaultTextStyle(
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.elasticIn,
+          style: isSelected
+              ? GoogleFonts.oswald(
+                  shadows: [
+                      const Shadow(
+                        color: Colors.black,
+                        offset: Offset(0, -10),
+                      ),
+                    ],
+                  fontSize: 25.0,
+                  color: Colors.transparent,
+                  decoration: TextDecoration.underline,
+                  decorationThickness: 2,
+                  decorationColor: Colors.tealAccent)
+              : GoogleFonts.roboto(color: Colors.black, fontSize: 20.0),
+          child: Text(
+            widget.title,
+          ),
         ),
       ),
+    );
+  }
+}
+
+class TabsMobile extends StatefulWidget {
+  final text;
+  final route;
+
+  const TabsMobile({super.key, required this.text, required this.route});
+
+  @override
+  State<TabsMobile> createState() => _TabsMobileState();
+}
+
+class _TabsMobileState extends State<TabsMobile> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialButton(
+      elevation: 20.0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(5.0),
+      ),
+      height: 50.0,
+      minWidth: 200.0,
+      color: Colors.black,
+      child: Text(
+        widget.text,
+        style: GoogleFonts.openSans(fontSize: 20.0, color: Colors.white),
+      ),
+      onPressed: () {
+        Navigator.of(context).pushNamed(widget.route);
+      },
     );
   }
 }
@@ -88,16 +128,42 @@ class Sans extends StatelessWidget {
   }
 }
 
+class AbelCustom extends StatelessWidget {
+  final text;
+  final size;
+  final color;
+  final fontWeight;
+
+  const AbelCustom(
+      {super.key,
+      required this.text,
+      required this.size,
+      this.color,
+      this.fontWeight});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: GoogleFonts.abel(
+        fontSize: size,
+        color: color ?? Colors.black,
+        fontWeight: fontWeight ?? FontWeight.normal,
+      ),
+    );
+  }
+}
+
 class TextForm extends StatelessWidget {
-  final String heading;
-  final double width;
+  final String text;
+  final double containerWidth;
   final String hintText;
   final dynamic maxLines;
 
   const TextForm(
       {super.key,
-      required this.heading,
-      required this.width,
+      required this.text,
+      required this.containerWidth,
       required this.hintText,
       this.maxLines});
 
@@ -106,10 +172,10 @@ class TextForm extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SansBold(text: heading, size: 16.0),
+        SansBold(text: text, size: 16.0),
         SizedBox(height: 5),
         SizedBox(
-          width: width,
+          width: containerWidth,
           child: TextFormField(
             maxLines: maxLines,
             decoration: InputDecoration(
@@ -137,20 +203,28 @@ class TextForm extends StatelessWidget {
   }
 }
 
-class AnimatedCardWeb extends StatefulWidget {
+class AnimatedCard extends StatefulWidget {
   final String imagePath;
-  final String text;
+  final text;
   final fit;
   final reverse;
+  final height;
+  final width;
 
-  const AnimatedCardWeb(
-      {super.key, required this.imagePath, required this.text, this.fit, this.reverse});
+  const AnimatedCard(
+      {super.key,
+      required this.imagePath,
+      this.text,
+      this.fit,
+      this.reverse,
+      this.height,
+      this.width});
 
   @override
-  State<AnimatedCardWeb> createState() => _AnimatedCardWebState();
+  State<AnimatedCard> createState() => _AnimatedCardState();
 }
 
-class _AnimatedCardWebState extends State<AnimatedCardWeb>
+class _AnimatedCardState extends State<AnimatedCard>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
@@ -186,16 +260,47 @@ class _AnimatedCardWebState extends State<AnimatedCardWeb>
             children: [
               Image.asset(
                 widget.imagePath,
-                height: 200,
-                width: 200,
+                height: widget.height ?? 200.0,
+                width: widget.width ?? 200.0,
                 fit: widget.fit,
               ),
               SizedBox(height: 10),
-              SansBold(text: widget.text, size: 15.0),
+              widget.text == null
+                  ? SizedBox()
+                  : SansBold(text: widget.text, size: 15.0),
             ],
           ),
         ),
       ),
     );
   }
+}
+
+Container tealContainer(String text) {
+  return Container(
+      decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.tealAccent,
+            style: BorderStyle.solid,
+            width: 2.0,
+          ),
+          borderRadius: BorderRadius.circular(5.0)),
+      padding: EdgeInsets.all(7.0),
+      child: Text(
+        text,
+        style: GoogleFonts.openSans(fontSize: 15.0),
+      ));
+}
+
+IconButton urlLauncher(String imgPath, String url) {
+  return IconButton(
+    icon: SvgPicture.asset(
+      imgPath,
+      colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),
+      width: 35.0,
+    ),
+    onPressed: () async {
+      await launchUrl(Uri.parse(url));
+    },
+  );
 }

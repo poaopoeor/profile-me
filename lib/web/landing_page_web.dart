@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:profile_me/components.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class LandingPageWeb extends StatefulWidget {
   const LandingPageWeb({super.key});
@@ -54,18 +52,16 @@ class _LandingPageWebState extends State<LandingPageWeb> {
         ),
         title: const Row(
           children: [
-            Spacer(
-              flex: 3,
-            ),
-            TabsWeb(title: "Home"),
+            Spacer(flex: 3),
+            TabsWeb(title: "Home", route: '/'),
             Spacer(),
-            TabsWeb(title: "Works"),
+            TabsWeb(title: "Works", route: '/works'),
             Spacer(),
-            TabsWeb(title: "Blog"),
+            TabsWeb(title: "Blog", route: '/blog'),
             Spacer(),
-            TabsWeb(title: "About"),
+            TabsWeb(title: "About", route: '/about'),
             Spacer(),
-            TabsWeb(title: "Contact"),
+            TabsWeb(title: "Contact", route: '/contact'),
             Spacer(),
           ],
         ),
@@ -92,9 +88,7 @@ class _LandingPageWebState extends State<LandingPageWeb> {
                         ),
                       ),
                       padding: EdgeInsets.symmetric(
-                        vertical: 10.0,
-                        horizontal: 20.0,
-                      ),
+                          vertical: 10.0, horizontal: 20.0),
                       child: SansBold(text: "Hello, I'm", size: 15),
                     ),
                     SizedBox(height: 15.0),
@@ -105,7 +99,6 @@ class _LandingPageWebState extends State<LandingPageWeb> {
                       children: [
                         Icon(Icons.email),
                         SizedBox(width: 20.0),
-                        Sans(text: "myname@gmail.com", size: 15.0)
                       ],
                     ),
                     SizedBox(height: 10.0),
@@ -159,15 +152,15 @@ class _LandingPageWebState extends State<LandingPageWeb> {
                     Sans(
                         text:
                             "Hello, I'm myname I specialize in flutter development",
-                        size: 15),
+                        size: 15.0),
                     Sans(
                         text:
                             "I strive to ensure astounding performance with state of",
-                        size: 15),
+                        size: 15.0),
                     Sans(
                         text:
                             "the art security for Android, Ios, Web, Mac, Linux and Windows",
-                        size: 15),
+                        size: 15.0),
                     SizedBox(height: 10),
                     Row(
                       children: [
@@ -255,20 +248,20 @@ class _LandingPageWebState extends State<LandingPageWeb> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    AnimatedCardWeb(
+                    AnimatedCard(
                       imagePath: "assets/webL.png",
                       text: "Web development",
                     ),
-                    AnimatedCardWeb(
+                    AnimatedCard(
                       imagePath: "assets/app.png",
                       text: "App development",
                       fit: BoxFit.contain,
                       reverse: true,
                     ),
-                    AnimatedCardWeb(
+                    AnimatedCard(
                       imagePath: "assets/firebase.png",
                       text: "Back-end development",
-                    )
+                    ),
                   ],
                 )
               ],
@@ -287,14 +280,14 @@ class _LandingPageWebState extends State<LandingPageWeb> {
                     Column(
                       children: [
                         TextForm(
-                          heading: "First Name",
-                          width: 350,
+                          text: "First Name",
+                          containerWidth: 350,
                           hintText: "Please enter your first name",
                         ),
                         SizedBox(height: 15.0),
                         TextForm(
-                          heading: "Email",
-                          width: 350,
+                          text: "Email",
+                          containerWidth: 350,
                           hintText: "Please enter your email address",
                         ),
                       ],
@@ -302,14 +295,14 @@ class _LandingPageWebState extends State<LandingPageWeb> {
                     Column(
                       children: [
                         TextForm(
-                          heading: "Last Name",
-                          width: 350,
+                          text: "Last Name",
+                          containerWidth: 350,
                           hintText: "Please enter your last name",
                         ),
                         SizedBox(height: 15.0),
                         TextForm(
-                          heading: "Phone number",
-                          width: 350,
+                          text: "Phone number",
+                          containerWidth: 350,
                           hintText: "Please enter your phone number",
                         ),
                       ],
@@ -317,8 +310,8 @@ class _LandingPageWebState extends State<LandingPageWeb> {
                   ],
                 ),
                 TextForm(
-                  heading: "Message",
-                  width: widthDevice / 1.5,
+                  text: "Message",
+                  containerWidth: widthDevice / 1.5,
                   hintText: "Please type your message",
                   maxLines: 10,
                 ),
@@ -339,19 +332,6 @@ class _LandingPageWebState extends State<LandingPageWeb> {
           ),
         ],
       ),
-    );
-  }
-
-  IconButton urlLauncher(String imgPath, String url) {
-    return IconButton(
-      icon: SvgPicture.asset(
-        imgPath,
-        colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),
-        width: 35.0,
-      ),
-      onPressed: () async {
-        await launchUrl(Uri.parse(url));
-      },
     );
   }
 }
