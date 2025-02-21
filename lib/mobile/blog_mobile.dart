@@ -1,5 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:logger/logger.dart';
 import 'package:profile_me/components.dart';
 
 class BlogMobile extends StatefulWidget {
@@ -10,6 +11,37 @@ class BlogMobile extends StatefulWidget {
 }
 
 class _BlogMobileState extends State<BlogMobile> {
+  // List title = ["Who is Dash?", "Who is Dash 1?"];
+  // List body = ["Well", "google it"];
+
+  // void article() async {
+  //   await FirebaseFirestore.instance
+  //       .collection("articles")
+  //       .get()
+  //       .then((querySnapshot) {
+  //     querySnapshot.docs.reversed.forEach((element) {
+  //       // print(element.data()['title']);
+  //     });
+  //   });
+  // }
+
+  void streamArticle() async {
+    var logger = Logger();
+    await for (var snapshot
+        in FirebaseFirestore.instance.collection("articles").snapshots()) {
+      for (var title in snapshot.docs.reversed) {
+        logger.d(title.data()['title']);
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    streamArticle();
+    // article();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -85,80 +117,32 @@ class _BlogMobileState extends State<BlogMobile> {
               ),
             ];
           },
-          body: ListView(
-            children: [
-              BlogPost(),
-              BlogPost(),
-              BlogPost(),
-              BlogPost(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class BlogPost extends StatefulWidget {
-  const BlogPost({super.key});
-
-  @override
-  State<BlogPost> createState() => _BlogPostState();
-}
-
-class _BlogPostState extends State<BlogPost> {
-  bool expand = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(left: 20.0, right: 20.0, top: 30.0),
-      child: Container(
-        padding: EdgeInsets.all(10.0),
-        decoration: BoxDecoration(
-            border: Border.all(
-          style: BorderStyle.solid,
-          width: 1.0,
-          color: Colors.black,
-        )),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 5.0),
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(3.0),
-                  ),
-                  child: AbelCustom(
-                    text: "Who is Dash?",
-                    size: 25.0,
-                    color: Colors.white,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      expand = !expand;
-                    });
+          body: StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection("articles")
+                .orderBy("title", descending: false)
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return ListView.builder(
+                  itemCount: snapshot.data!.docs.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    DocumentSnapshot documentSnapshot =
+                        snapshot.data!.docs[index];
+                    return BlogPost(
+                        title: documentSnapshot["title"],
+                        body: documentSnapshot["body"],
+                        left: 20.0,
+                        right: 20.0,
+                        top: 30.0,
+                        padding: 10.0);
                   },
-                  icon: Icon(Icons.arrow_drop_down_circle_outlined),
-                  color: Colors.black,
-                ),
-              ],
-            ),
-            SizedBox(height: 7.0),
-            Text(
-              "As soon as Shams Zakhour started working as a Dart writer at Google in December 2013, she started advocating for a Dart mascot. After documenting Java for 14 years, she had observed how beloved the Java mascot, Duke, had become, and she wanted something similar for Dart.But the idea didn't gain momentum until 2017, when one of the Flutter engineers, Nina Chen, suggested it on an internal mailing list. The Flutter VP at the time, Joshy Joseph, approved the idea and asked the organizer for the 2018 Dart Conference, Linda Rasmussen, to make it happen.Once Shams heard about these plans, she rushed to Linda and asked to own and drive the project to produce the plushies for the conference. Linda had already elicited some design sketches, which she handed off. Starting with the sketches, Shams located a vendor who could work within an aggressive deadline (competing with Lunar New Year), and started the process of creating the specs for the plushy.That's right, Dash was originally a Dart mascot, not a Flutter mascot.",
-              style: GoogleFonts.openSans(fontSize: 15.0),
-              maxLines: expand == true ? null : 3,
-              overflow:
-                  expand == true ? TextOverflow.visible : TextOverflow.ellipsis,
-            ),
-          ],
+                );
+              } else {
+                return CircularProgressIndicator();
+              }
+            },
+          ),
         ),
       ),
     );

@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:logger/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class TabsWeb extends StatefulWidget {
@@ -159,13 +161,17 @@ class TextForm extends StatelessWidget {
   final double containerWidth;
   final String hintText;
   final dynamic maxLines;
+  final controller;
+  final validator;
 
   const TextForm(
       {super.key,
       required this.text,
       required this.containerWidth,
       required this.hintText,
-      this.maxLines});
+      this.maxLines,
+      required this.controller,
+      required this.validator});
 
   @override
   Widget build(BuildContext context) {
@@ -177,11 +183,17 @@ class TextForm extends StatelessWidget {
         SizedBox(
           width: containerWidth,
           child: TextFormField(
+            validator: validator,
+            controller: controller,
             maxLines: maxLines,
             decoration: InputDecoration(
-              focusedErrorBorder: OutlineInputBorder(
+              errorBorder: OutlineInputBorder(
                 borderSide: BorderSide(color: Colors.red),
                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.red),
+                borderRadius: BorderRadius.all(Radius.circular(15.0)),
               ),
               enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(color: Colors.teal),
@@ -303,4 +315,119 @@ IconButton urlLauncher(String imgPath, String url) {
       await launchUrl(Uri.parse(url));
     },
   );
+}
+
+class BlogPost extends StatefulWidget {
+  final title;
+  final body;
+  final double left;
+  final double right;
+  final double top;
+  final double padding;
+
+  const BlogPost(
+      {super.key,
+      required this.title,
+      required this.body,
+      required this.left,
+      required this.right,
+      required this.top,
+      required this.padding});
+
+  @override
+  State<BlogPost> createState() => _BlogPostState();
+}
+
+class _BlogPostState extends State<BlogPost> {
+  bool expand = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+          left: widget.left, right: widget.right, top: widget.top),
+      child: Container(
+        padding: EdgeInsets.all(widget.padding),
+        decoration: BoxDecoration(
+            border: Border.all(
+          style: BorderStyle.solid,
+          width: 1.0,
+          color: Colors.black,
+        )),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 5.0),
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(3.0),
+                  ),
+                  child: AbelCustom(
+                    text: widget.title,
+                    size: 25.0,
+                    color: Colors.white,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      expand = !expand;
+                    });
+                  },
+                  icon: Icon(Icons.arrow_drop_down_circle_outlined),
+                  color: Colors.black,
+                ),
+              ],
+            ),
+            SizedBox(height: 7.0),
+            Text(
+              widget.body,
+              style: GoogleFonts.openSans(fontSize: 15.0),
+              maxLines: expand == true ? null : 3,
+              overflow:
+                  expand == true ? TextOverflow.visible : TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class AddDataFirestore {
+  var logger = Logger();
+  CollectionReference response =
+      FirebaseFirestore.instance.collection('messages');
+
+  Future addResponse(final firstName, final lastName, final email,
+      final phoneNumber, final message) async {
+    return response.add({
+      'firstName': firstName,
+      'lastName': lastName,
+      'email': email,
+      'phoneNumber': phoneNumber,
+      'message': message
+    }).then((value) {
+      logger.d("Success");
+      return true;
+    }).catchError((error) {
+      logger.d(error);
+      return false;
+    });
+  }
+}
+
+Future DialogError(BuildContext context, String title) {
+  return showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            title: SansBold(text: title, size: 20.0),
+          ));
 }
